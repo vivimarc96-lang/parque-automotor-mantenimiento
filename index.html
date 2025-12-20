@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Gestión Parque Automotor</title>
+<style>
+body { font-family: Arial; background:#eef2f3; padding:20px; }
+.container { background:#fff; padding:20px; border-radius:8px; max-width:1000px; margin:auto; }
+h1, h2 { text-align:center; }
+input, select, button { padding:8px; margin:5px; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+th { background:#0077cc; color:white; }
+.alerta { background:#ffcccc; }
+.ok { background:#ccffcc; }
+.hidden { display:none; }
+</style>
+</head>
+
+<body>
+
+<div class="container" id="login">
+<h1>🔐 Acceso al Sistema</h1>
+<select id="rol">
+<option value="">Seleccione rol</option>
+<option value="Administrador">Administrador</option>
+<option value="Operador">Operador</option>
+</select>
+<button onclick="ingresar()">Ingresar</button>
+</div>
+
+<div class="container hidden" id="app">
+<h1>🚘 Sistema de Mantenimiento del Parque Automotor</h1>
+<p><strong>Rol:</strong> <span id="rolActivo"></span></p>
+
+<div id="adminPanel">
+<h2>Registro de Vehículos</h2>
+<input id="placa" placeholder="Placa">
+<input id="km" type="number" placeholder="Kilometraje actual">
+<input id="kmMant" type="number" placeholder="Km mantenimiento">
+<button onclick="agregar()">Registrar</button>
+</div>
+
+<h2>Flota Vehicular</h2>
+<table>
+<thead>
+<tr>
+<th>Placa</th>
+<th>Kilometraje</th>
+<th>Km Mantenimiento</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+
+<h2>📊 Reportes</h2>
+<p>Total vehículos: <span id="total"></span></p>
+<p>Mantenimiento pendiente: <span id="pendientes"></span></p>
+
+</div>
+
+<script>
+let vehiculos = [];
+let rol = "";
+
+function ingresar(){
+rol = document.getElementById("rol").value;
+if(!rol){ alert("Seleccione un rol"); return; }
+document.getElementById("login").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+document.getElementById("rolActivo").innerText = rol;
+if(rol === "Operador") document.getElementById("adminPanel").style.display="none";
+}
+
+function agregar(){
+const placa = document.getElementById("placa").value;
+const km = Number(document.getElementById("km").value);
+const kmMant = Number(document.getElementById("kmMant").value);
+if(!placa || !km || !kmMant){ alert("Complete los datos"); return; }
+vehiculos.push({ placa, km, kmMant });
+render();
+}
+
+function render(){
+let html="", pendientes=0;
+vehiculos.forEach(v=>{
+let estado="En regla", clase="ok";
+if(v.km >= v.kmMant){ estado="⚠ Requiere mantenimiento"; clase="alerta"; pendientes++; }
+html+=`<tr class="${clase}">
+<td>${v.placa}</td>
+<td>${v.km}</td>
+<td>${v.kmMant}</td>
+<td>${estado}</td>
+</tr>`;
+});
+document.getElementById("tabla").innerHTML=html;
+document.getElementById("total").innerText=vehiculos.length;
+document.getElementById("pendientes").innerText=pendientes;
+}
+</script>
+
+</body>
+</html>
