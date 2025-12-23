@@ -1,103 +1,166 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Gestión Parque Automotor</title>
-<style>
-body { font-family: Arial; background:#eef2f3; padding:20px; }
-.container { background:#fff; padding:20px; border-radius:8px; max-width:1000px; margin:auto; }
-h1, h2 { text-align:center; }
-input, select, button { padding:8px; margin:5px; }
-table { width:100%; border-collapse:collapse; margin-top:15px; }
-th, td { border:1px solid #ccc; padding:8px; text-align:center; }
-th { background:#0077cc; color:white; }
-.alerta { background:#ffcccc; }
-.ok { background:#ccffcc; }
-.hidden { display:none; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mantenimiento Parque Automotor</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f6f9;
+      margin:0;
+      padding:0;
+    }
+    header{
+      background:#0b5ed7;
+      color:white;
+      padding:15px;
+      text-align:center;
+    }
+    main{
+      padding:20px;
+      max-width:900px;
+      margin:auto;
+    }
+    section{
+      background:white;
+      padding:15px;
+      margin-bottom:20px;
+      border-radius:6px;
+      box-shadow:0 0 5px rgba(0,0,0,.1);
+    }
+    h2{
+      margin-top:0;
+      color:#0b5ed7;
+    }
+    label{
+      display:block;
+      margin-top:10px;
+      font-weight:bold;
+    }
+    input, select, button{
+      width:100%;
+      padding:8px;
+      margin-top:5px;
+    }
+    button{
+      background:#0b5ed7;
+      color:white;
+      border:none;
+      cursor:pointer;
+      margin-top:15px;
+    }
+    button:hover{
+      background:#084298;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+    th, td{
+      border:1px solid #ccc;
+      padding:8px;
+      text-align:center;
+    }
+    th{
+      background:#e9ecef;
+    }
+    footer{
+      text-align:center;
+      padding:10px;
+      background:#dee2e6;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container" id="login">
-<h1>🔐 Acceso al Sistema</h1>
-<select id="rol">
-<option value="">Seleccione rol</option>
-<option value="Administrador">Administrador</option>
-<option value="Operador">Operador</option>
-</select>
-<button onclick="ingresar()">Ingresar</button>
-</div>
+<header>
+  <h1>Sistema de Mantenimiento del Parque Automotor</h1>
+  <p>Control por kilometraje</p>
+</header>
 
-<div class="container hidden" id="app">
-<h1>🚘 Sistema de Mantenimiento del Parque Automotor</h1>
-<p><strong>Rol:</strong> <span id="rolActivo"></span></p>
+<main>
 
-<div id="adminPanel">
-<h2>Registro de Vehículos</h2>
-<input id="placa" placeholder="Placa">
-<input id="km" type="number" placeholder="Kilometraje actual">
-<input id="kmMant" type="number" placeholder="Km mantenimiento">
-<button onclick="agregar()">Registrar</button>
-</div>
+  <!-- REGISTRO DE USUARIO -->
+  <section>
+    <h2>Ingreso al sistema</h2>
+    <label>Rol de usuario</label>
+    <select id="rol">
+      <option>Administrador</option>
+      <option>Operador</option>
+    </select>
+  </section>
 
-<h2>Flota Vehicular</h2>
-<table>
-<thead>
-<tr>
-<th>Placa</th>
-<th>Kilometraje</th>
-<th>Km Mantenimiento</th>
-<th>Estado</th>
-</tr>
-</thead>
-<tbody id="tabla"></tbody>
-</table>
+  <!-- REGISTRO DE VEHÍCULO -->
+  <section>
+    <h2>Registro de Vehículo</h2>
+    <label>Placa</label>
+    <input type="text" id="placa">
 
-<h2>📊 Reportes</h2>
-<p>Total vehículos: <span id="total"></span></p>
-<p>Mantenimiento pendiente: <span id="pendientes"></span></p>
+    <label>Kilometraje actual</label>
+    <input type="number" id="km">
 
-</div>
+    <label>Tipo de mantenimiento</label>
+    <select id="tipo">
+      <option>Preventivo</option>
+      <option>Correctivo</option>
+    </select>
+
+    <button onclick="registrar()">Registrar mantenimiento</button>
+  </section>
+
+  <!-- TABLA DE RESULTADOS -->
+  <section>
+    <h2>Historial de Mantenimiento</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Placa</th>
+          <th>Kilometraje</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="tabla">
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <p>Prototipo académico - Gestión de mantenimiento vehicular</p>
+</footer>
 
 <script>
-let vehiculos = [];
-let rol = "";
+  function registrar(){
+    let placa = document.getElementById("placa").value;
+    let km = document.getElementById("km").value;
+    let tipo = document.getElementById("tipo").value;
 
-function ingresar(){
-rol = document.getElementById("rol").value;
-if(!rol){ alert("Seleccione un rol"); return; }
-document.getElementById("login").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
-document.getElementById("rolActivo").innerText = rol;
-if(rol === "Operador") document.getElementById("adminPanel").style.display="none";
-}
+    if(placa === "" || km === ""){
+      alert("Por favor complete todos los campos");
+      return;
+    }
 
-function agregar(){
-const placa = document.getElementById("placa").value;
-const km = Number(document.getElementById("km").value);
-const kmMant = Number(document.getElementById("kmMant").value);
-if(!placa || !km || !kmMant){ alert("Complete los datos"); return; }
-vehiculos.push({ placa, km, kmMant });
-render();
-}
+    let estado = km >= 10000 ? "Mantenimiento requerido" : "En regla";
 
-function render(){
-let html="", pendientes=0;
-vehiculos.forEach(v=>{
-let estado="En regla", clase="ok";
-if(v.km >= v.kmMant){ estado="⚠ Requiere mantenimiento"; clase="alerta"; pendientes++; }
-html+=`<tr class="${clase}">
-<td>${v.placa}</td>
-<td>${v.km}</td>
-<td>${v.kmMant}</td>
-<td>${estado}</td>
-</tr>`;
-});
-document.getElementById("tabla").innerHTML=html;
-document.getElementById("total").innerText=vehiculos.length;
-document.getElementById("pendientes").innerText=pendientes;
-}
+    let fila = `
+      <tr>
+        <td>${placa}</td>
+        <td>${km}</td>
+        <td>${tipo}</td>
+        <td>${estado}</td>
+      </tr>
+    `;
+
+    document.getElementById("tabla").innerHTML += fila;
+
+    document.getElementById("placa").value = "";
+    document.getElementById("km").value = "";
+  }
 </script>
 
 </body>
