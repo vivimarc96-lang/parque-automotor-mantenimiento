@@ -2,166 +2,146 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <title>Parque Automotor – Mantenimiento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mantenimiento Parque Automotor</title>
   <style>
-    body{
-      font-family: Arial, sans-serif;
-      background:#f4f6f9;
-      margin:0;
-      padding:0;
-    }
-    header{
-      background:#0b5ed7;
-      color:white;
-      padding:15px;
-      text-align:center;
-    }
-    main{
-      padding:20px;
-      max-width:900px;
-      margin:auto;
-    }
-    section{
-      background:white;
-      padding:15px;
-      margin-bottom:20px;
-      border-radius:6px;
-      box-shadow:0 0 5px rgba(0,0,0,.1);
-    }
-    h2{
-      margin-top:0;
-      color:#0b5ed7;
-    }
-    label{
-      display:block;
-      margin-top:10px;
-      font-weight:bold;
-    }
-    input, select, button{
-      width:100%;
-      padding:8px;
-      margin-top:5px;
-    }
-    button{
-      background:#0b5ed7;
-      color:white;
-      border:none;
-      cursor:pointer;
-      margin-top:15px;
-    }
-    button:hover{
-      background:#084298;
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-    }
-    th, td{
-      border:1px solid #ccc;
-      padding:8px;
-      text-align:center;
-    }
-    th{
-      background:#e9ecef;
-    }
-    footer{
-      text-align:center;
-      padding:10px;
-      background:#dee2e6;
-    }
+    body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; }
+    header { background:#1f2937; color:#fff; padding:15px; text-align:center; }
+    main { max-width:1000px; margin:auto; padding:20px; }
+    .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.1); margin-bottom:20px; }
+    h2 { margin-top:0; color:#1f2937; }
+    input, select, button { width:100%; padding:10px; margin:6px 0; }
+    button { background:#2563eb; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+    button:hover { background:#1e40af; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+    th { background:#e5e7eb; }
+    .hidden { display:none; }
+    .total { font-weight:bold; margin-top:10px; }
+    footer { text-align:center; padding:10px; color:#555; }
   </style>
 </head>
-
 <body>
 
 <header>
-  <h1>Sistema de Mantenimiento del Parque Automotor</h1>
-  <p>Control por kilometraje</p>
+  <h1>Parque Automotor – Mantenimiento</h1>
+  <p>Simulación de control y registro</p>
 </header>
 
 <main>
 
-  <!-- REGISTRO DE USUARIO -->
-  <section>
-    <h2>Ingreso al sistema</h2>
-    <label>Rol de usuario</label>
-    <select id="rol">
-      <option>Administrador</option>
-      <option>Operador</option>
-    </select>
-  </section>
+  <!-- LOGIN -->
+  <div class="card" id="loginCard">
+    <h2>Inicio de Sesión</h2>
+    <input type="text" id="usuario" placeholder="Usuario" />
+    <input type="password" id="clave" placeholder="Contraseña" />
+    <button onclick="login()">Ingresar</button>
+    <p><small>Usuario: <b>admin</b> | Contraseña: <b>1234</b></small></p>
+  </div>
 
-  <!-- REGISTRO DE VEHÍCULO -->
-  <section>
-    <h2>Registro de Vehículo</h2>
-    <label>Placa</label>
-    <input type="text" id="placa">
+  <!-- APP -->
+  <div class="card hidden" id="appCard">
+    <h2>Registro de Mantenimiento</h2>
 
-    <label>Kilometraje actual</label>
-    <input type="number" id="km">
-
-    <label>Tipo de mantenimiento</label>
+    <!-- FORMULARIO -->
+    <input type="text" id="placa" placeholder="Placa del vehículo" />
     <select id="tipo">
+      <option value="">Tipo de mantenimiento</option>
       <option>Preventivo</option>
       <option>Correctivo</option>
+      <option>Revisión general</option>
     </select>
+    <input type="date" id="fecha" />
+    <input type="number" id="costo" placeholder="Costo ($)" />
+    <button onclick="guardar()">Guardar mantenimiento</button>
 
-    <button onclick="registrar()">Registrar mantenimiento</button>
-  </section>
-
-  <!-- TABLA DE RESULTADOS -->
-  <section>
-    <h2>Historial de Mantenimiento</h2>
+    <!-- TABLA -->
+    <h2>Historial de Mantenimientos</h2>
     <table>
       <thead>
         <tr>
           <th>Placa</th>
-          <th>Kilometraje</th>
           <th>Tipo</th>
-          <th>Estado</th>
+          <th>Fecha</th>
+          <th>Costo</th>
         </tr>
       </thead>
-      <tbody id="tabla">
-      </tbody>
+      <tbody id="tabla"></tbody>
     </table>
-  </section>
+
+    <div class="total" id="total"></div>
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
 
 </main>
 
 <footer>
-  <p>Prototipo académico - Gestión de mantenimiento vehicular</p>
+  © 2025 – Proyecto Académico | Marcela León Ortiz
 </footer>
 
 <script>
-  function registrar(){
-    let placa = document.getElementById("placa").value;
-    let km = document.getElementById("km").value;
-    let tipo = document.getElementById("tipo").value;
+  // LOGIN
+  function login() {
+    const u = document.getElementById("usuario").value;
+    const c = document.getElementById("clave").value;
+    if (u === "admin" && c === "1234") {
+      document.getElementById("loginCard").classList.add("hidden");
+      document.getElementById("appCard").classList.remove("hidden");
+      cargar();
+    } else {
+      alert("Credenciales incorrectas");
+    }
+  }
 
-    if(placa === "" || km === ""){
-      alert("Por favor complete todos los campos");
+  function logout() {
+    location.reload();
+  }
+
+  // DATOS
+  function guardar() {
+    const placa = document.getElementById("placa").value;
+    const tipo = document.getElementById("tipo").value;
+    const fecha = document.getElementById("fecha").value;
+    const costo = document.getElementById("costo").value;
+
+    if (!placa || !tipo || !fecha || !costo) {
+      alert("Complete todos los campos");
       return;
     }
 
-    let estado = km >= 10000 ? "Mantenimiento requerido" : "En regla";
+    const datos = JSON.parse(localStorage.getItem("mantenimientos") || "[]");
+    datos.push({ placa, tipo, fecha, costo: Number(costo) });
+    localStorage.setItem("mantenimientos", JSON.stringify(datos));
+    limpiar();
+    cargar();
+  }
 
-    let fila = `
-      <tr>
-        <td>${placa}</td>
-        <td>${km}</td>
-        <td>${tipo}</td>
-        <td>${estado}</td>
-      </tr>
-    `;
+  function cargar() {
+    const datos = JSON.parse(localStorage.getItem("mantenimientos") || "[]");
+    const tbody = document.getElementById("tabla");
+    tbody.innerHTML = "";
+    let suma = 0;
 
-    document.getElementById("tabla").innerHTML += fila;
+    datos.forEach(d => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${d.placa}</td><td>${d.tipo}</td><td>${d.fecha}</td><td>$${d.costo}</td>`;
+      tbody.appendChild(tr);
+      suma += d.costo;
+    });
 
+    document.getElementById("total").innerText =
+      "Total invertido en mantenimiento: $" + suma;
+  }
+
+  function limpiar() {
     document.getElementById("placa").value = "";
-    document.getElementById("km").value = "";
+    document.getElementById("tipo").value = "";
+    document.getElementById("fecha").value = "";
+    document.getElementById("costo").value = "";
   }
 </script>
 
 </body>
 </html>
+
+
